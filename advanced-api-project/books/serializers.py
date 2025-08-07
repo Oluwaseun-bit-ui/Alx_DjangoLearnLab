@@ -4,10 +4,10 @@ from .models import Author, Book
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = '__all__'
+        fields = ['id', 'title', 'author']
 
 class AuthorSerializer(serializers.ModelSerializer):
-    books = BookSerializer(many=True, read_only=True)  # ← This is what ALX is looking for
+    books = BookSerializer(many=True, read_only=True)
 
     class Meta:
         model = Author
