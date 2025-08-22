@@ -2,9 +2,8 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from .serializers import RegisterSerializer, UserSerializer
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -31,4 +30,3 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
-
