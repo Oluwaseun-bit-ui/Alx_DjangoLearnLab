@@ -1,6 +1,7 @@
 from rest_framework import viewsets, generics, permissions
-from .models import Post, Comment
+from .models import Post, Comment, Like 
 from .serializers import PostSerializer, CommentSerializer
+from notifications.models import Notification
 
 # Custom permission so only owners can edit/delete their own stuff
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -37,3 +38,33 @@ class FollowingPostsView(generics.ListAPIView):
         # get posts from those users
         return Post.objects.filter(author__in=following_users).order_by('-created_at')
     
+class LikePostView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = generics.get_object_or_404(Post, pk=pk)
+
+        # Create like if not exists
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+        # Notify post author
+        if created and post.user != request.user:
+            Notification.objects.create(
+                recipient=post.user,
+                actor=request.user,
+                verb="liked",
+                target=post
+            )
+
+        return Response({"message": "Post liked!"})
+
+
+class UnlikePostView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = generics.get_object_or_404(Post, pk=pk)
+        like = Like.objects.filter(user=request.user, post=post).first()
+        if like:
+            like.delete()
+        return Response({"message": "Post unliked!"})
