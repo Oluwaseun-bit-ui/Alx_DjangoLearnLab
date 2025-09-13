@@ -2,6 +2,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.decorators import login_required
 
 # Login view
 def login_view(request):
@@ -29,10 +30,9 @@ def register_view(request):
 
 
 # Profile view (for logged-in users)
-def profile_view(request):
+@login_required
+def profile(request):
     return render(request, 'registration/profile.html')
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
 
 def register(request):
     if request.method == 'POST':
